@@ -22,11 +22,17 @@ const Register = () => {
 
     const concerns = [
         'Acne',
-        'Aging',
+        'Blackheads',
+        'Dark circles',
+        'Dull',
+        'Fine lines',
         'Pigmentation',
+        'Pores',
         'Redness',
         'Dryness',
-        'Sensitivity'
+        'Sensitivity',
+        'Whiteheads',
+        'Wrinkles'
       ];
 
   return (
