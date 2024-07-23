@@ -110,7 +110,11 @@ const Analyse = () => {
           
         </>
         : <>
-            please login
+            <div className="flex items-center justify-center h-full">
+              <div className="bg-violet-400 rounded p-10 shadow-xl text-3xl text-white my-[10rem]">
+                Please login to use this feature!
+              </div>
+            </div>
         </>
       }
     </div>

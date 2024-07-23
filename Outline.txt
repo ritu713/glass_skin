@@ -1,30 +1,6 @@
-Features
-1. Account signup/signin
-2. Make daily checklist for skincare activities
-3. On signup, take a skin health assessment
-4. Add recommended products
-5. Skincare blogs
-6. My progress tracker
- 
-Frontend 
-
-React.js + Vite
-Tailwind CSS
-
-Backend
-
-MongoDB
-Mongoose
-Node.js
-Express.js
-
-Product recommendation
-
-Kaggle dataset
-Python + libraries
-
-
 Future scope
 1. Edit profile
 2. Registration success mail to user
 3. profile picture setting
+4. Add user verification in flask server
+5. Host website online
