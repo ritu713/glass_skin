@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-email/link": "^0.0.8",
     "axios": "^1.7.2",
+    "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.5",
@@ -20,6 +21,7 @@
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@types/tailwindcss": "^3.1.0",

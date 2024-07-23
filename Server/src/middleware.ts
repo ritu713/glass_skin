@@ -13,7 +13,6 @@ declare global {
 const verifyToken = async (req : Request, res : Response, next : NextFunction) => {
     const token = await req.cookies["auth_token"]
     if(!token){
-        console.log("Cookie value " , req.cookies)
         return res.status(401).json({message : "Unauthorized"})
     }
     try {
@@ -22,7 +21,7 @@ const verifyToken = async (req : Request, res : Response, next : NextFunction) =
         next()
     }
     catch(err : any){
-        return res.status(500).json({message : "Unauthorised"})
+        return res.status(500).json({message : "An error occured"})
     }
 }
 

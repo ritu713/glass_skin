@@ -105,13 +105,13 @@ const Register = () => {
                         </select>
                     </label>
                     
-                    <b>Skin Concern</b>
+                    <b>Skin Concern</b> 
                     <br/>
-                    <div>
+                    <div className='grid grid-cols-4 space-y-4'>
                     {
                         concerns.map(concern => {
                             return (
-                                <label className="cursor-pointer mr-5">
+                                <label className="cursor-pointer">
                                     <input className='peer hidden' type='checkbox' {...register("skinConcerns")} value={concern}/>
                                     <span className='peer-checked:bg-violet-400 bg-gray-300 p-2 rounded-sm font-semibold'>{concern}</span>
                                 </label>)

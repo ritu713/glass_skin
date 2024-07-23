@@ -1,6 +1,8 @@
-import { LoginFormData, RegisterFormData, RoutineData} from "../../Server/shared/types";
+import { AnalyserData, LoginFormData, RegisterFormData, RoutineData, feature_list } from "../../Server/shared/types";
+// import Cookies from 'js-cookie'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const FLASK_SERVER_BASE_URL = import.meta.env.VITE_FLASK_SERVER_BASE_URL || ""
 
 //auth related fetches
 export const createNewUser = async (form_data : RegisterFormData) => {
@@ -118,4 +120,44 @@ export const deleteRoutine = async (routineID : string) => {
     }
 
     return response.json()
+}
+
+
+//recommendation system results fetch
+export const recommend = async (data : AnalyserData) => {
+    let vector = []
+    const skin = feature_list.indexOf(data.skinType)
+    // console.log("Skin type idx" + skin + " " + data.skinType)
+    for(let i = 0; i<5; i++){
+        if(skin == i) vector.push(1)
+        else vector.push(0);
+    }
+
+    for(let i = 5; i<feature_list.length; i++){
+        if(data.concerns.includes(feature_list[i])){
+            vector.push(1);
+        } else {
+            vector.push(0);
+        }
+    }
+    // const cookie = Cookies.get("auth_token")
+    // console.log("Cookie : " , cookie);
+
+    const response = await fetch(`${FLASK_SERVER_BASE_URL}/recommend_products`, {
+        credentials: "include",
+        method: "POST",
+        body : JSON.stringify(vector),
+        headers : {
+            "Content-Type" : "application/json",
+            // "Cookie" :  Cookies.get("auth_token") as string,
+        }
+    });
+
+    // console.log("Received response from flask server : ", response.json())
+
+    if(!response.ok){
+        throw new Error("Something went wrong")
+    }
+
+    return response.json();
 }
