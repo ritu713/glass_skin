@@ -8,19 +8,18 @@ const Profile = () => {
   const navigate = useNavigate()
 
   const { data , error } = useQuery("fetchCurrentUser", apiClient.fetchCurrentUser)
-  console.log(data,error)
-  
   const user = data?.user
   
 
-  const mutation = useMutation(apiClient.logout, {
+  const mutation = useMutation(() => apiClient.logout(), {
     onSuccess : async () => {
       await queryClient.invalidateQueries("validateToken")
       alert("Signed out")
       navigate("/")
     },
     onError : (err : Error) => {
-      alert("Error during signout"+ err.message)
+      console.log("Failed")
+      alert("Error during signout")
     }
   })
 

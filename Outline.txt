@@ -2,5 +2,5 @@ Future scope
 1. Edit profile
 2. Registration success mail to user
 3. profile picture setting
-4. Add user verification in flask server
+4. Login - password check
 5. Host website online

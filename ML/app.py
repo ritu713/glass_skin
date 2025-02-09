@@ -16,7 +16,7 @@ def fun():
     return jsonify({"message" : "Server up and running!"}), 200
 
 
-@app.route('/recommend_products', methods=['POST'])
+@app.route('/recommendation_model', methods=['POST'])
 # @verify_token
 def recommendations():
     try:

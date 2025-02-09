@@ -2,7 +2,7 @@ import { AnalyserData, LoginFormData, RegisterFormData, RoutineData, feature_lis
 // import Cookies from 'js-cookie'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
-const FLASK_SERVER_BASE_URL = import.meta.env.VITE_FLASK_SERVER_BASE_URL || ""
+// const FLASK_SERVER_BASE_URL = import.meta.env.VITE_FLASK_SERVER_BASE_URL || ""
 
 //auth related fetches
 export const createNewUser = async (form_data : RegisterFormData) => {
@@ -63,6 +63,7 @@ export const login = async (form_data : LoginFormData) => {
 
 export const logout = async () => {
     const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {credentials : "include", method : "POST"})
+
     if(!response.ok){
         throw new Error("Error during sign out")
     }
@@ -140,20 +141,19 @@ export const recommend = async (data : AnalyserData) => {
             vector.push(0);
         }
     }
-    // const cookie = Cookies.get("auth_token")
-    // console.log("Cookie : " , cookie);
 
-    const response = await fetch(`${FLASK_SERVER_BASE_URL}/recommend_products`, {
+    console.log("Sending request")
+
+    const response = await fetch(`${API_BASE_URL}/api/analyser/recommend_products`, {
         credentials: "include",
         method: "POST",
         body : JSON.stringify(vector),
         headers : {
             "Content-Type" : "application/json",
-            // "Cookie" :  Cookies.get("auth_token") as string,
         }
     });
 
-    // console.log("Received response from flask server : ", response.json())
+    console.log(response.body)
 
     if(!response.ok){
         throw new Error("Something went wrong")

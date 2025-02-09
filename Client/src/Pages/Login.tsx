@@ -17,7 +17,7 @@ const Login = () => {
 			navigate('/')
 		},
 		onError : (err:any) => {
-			alert("Looks like something went wrong!"+ err.message)
+			alert("Looks like something went wrong!")
 		}
 	})
 

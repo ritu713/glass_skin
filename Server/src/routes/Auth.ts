@@ -41,7 +41,7 @@ router.post('/register', [
         // console.log("Error occured : " + error);
         return res.status(500).json({message : "Something went wrong"})
     }
-})
+});
 
 router.post('/login', [
     check("emailID", "Please enter your registered email").isEmail(),
@@ -95,9 +95,12 @@ router.get('/user', verifyToken, async (req : Request, res : Response) => {
 
 router.post('/logout', (req : Request, res : Response) => {
     res.cookie("auth_token", "", {
-        expires : new Date(0)
+        expires : new Date(0),
+        httpOnly : true,
+        path : "/",
     })
-    return res.status(200);
+
+    return res.status(200).json({'message' : 'Logged out successfully'});
 })
 
 export default router
