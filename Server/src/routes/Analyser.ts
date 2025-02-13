@@ -9,7 +9,8 @@ router.post('/recommend_products', verifyToken, async (req: Request, res: Respon
         const flaskResponse = await fetch(`${process.env.FLASK_SERVER}/recommendation_model`, {
             method: 'POST',
             headers: {
-                "Content-Type" : "application/json"
+                "Content-Type" : "application/json",
+                "Requester" : `http://localhost:${process.env.PORT}`
             },
             body : JSON.stringify(requestData)
         });
