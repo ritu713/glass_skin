@@ -7,8 +7,8 @@ data = pd.read_csv(df_path)
 
 
 # Data preprocessing 
-data['concern 2'].fillna('', inplace = True)
-data['concern 3'].fillna('', inplace = True)
+data['concern 2'] = data['concern 2'].fillna('')
+data['concern 3'] = data['concern 3'].fillna('')
 data['concern'] = data['concern'] + ',' + data['concern 2'] + ',' + data['concern 3']
 
 data.drop(columns=['concern 2', 'concern 3', 'formulation', 'key ingredient', 'spf'], inplace = True)

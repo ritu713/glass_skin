@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import json
+import os
 from flask_cors import CORS
 from dotenv import load_dotenv
 from skincare_recommender_model import recommend_essentials
@@ -7,7 +8,7 @@ from middleware import verify_origin
 
 app = Flask(__name__)
 load_dotenv()
-CORS(app, supports_credentials=True)
+CORS(app, origins=[os.getenv('NODE_URL')])
 
 @app.route("/", methods=['GET'])
 def fun():
@@ -15,13 +16,14 @@ def fun():
 
 
 @app.route('/recommendation_model', methods=['POST'])
-@verify_origin
 def recommendations():
     try:
         input = request.json
+        print(type(input))
         prods = recommend_essentials(vector = input)
         return jsonify({"message" : json.dumps(prods)})
     except Exception as e:
+        print(e)
         return jsonify({'message' : str(e)}),  500
 
 
