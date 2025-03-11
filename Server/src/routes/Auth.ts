@@ -5,8 +5,10 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import User from '../models/User/User'
 import verifyToken from '../middleware'
+import { PrismaClient } from '@prisma/client'
 //routes
 const router = express.Router();
+const prisma = new PrismaClient();
 
 //registeration route
 router.post('/register', [
@@ -21,25 +23,42 @@ router.post('/register', [
         if(!validationError.isEmpty()){
             return res.status(400).json({message : validationError.array()})
         }
+        const { emailID, password, profile } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        //check if user already exists
-        let user = await User.findOne({emailID : req.body.emailID})
+        const user = await prisma.user.findUnique({where : {emailID : emailID}})
         if(user){
             return res.status(400).json({message : "User already exists with this email"});
         }
 
-        //create new user, if user DNE
-        user = await User.create(req.body);
+        // Create user with profile
+        const newUser = await prisma.user.create({
+            data: {
+                emailID,
+                password: hashedPassword,
+                createdAt: new Date(),
+                profile: {
+                    create: {
+                        fName: profile.fName,
+                        lName: profile.lName,
+                        profilePicture: profile.profilePicture || "", // optional field
+                        skinType: profile.skinType,
+                        skinConcerns: profile.skinConcerns || [],
+                    },
+                },
+            },
+            include: { profile: true }, // Include profile in the response
+        });
 
         //create JWT token which lasts for 1 week and a cookie in the result storing the token.
-        const token = jwt.sign({userID : user._id}, process.env.JWT_SECRET_KEY as string, {expiresIn : "7d"})
+        const token = jwt.sign({userID : newUser.id}, process.env.JWT_SECRET_KEY as string, {expiresIn : "7d"})
         res.cookie("auth_token", token, {maxAge: 604800000, httpOnly : true, secure : process.env.NODE_ENV === 'production'});
 
         return res.status(200).send({message : "User registered OK"})
     }
     catch(error : any){
-        // console.log("Error occured : " + error);
-        return res.status(500).json({message : "Something went wrong"})
+        console.log("Error occured : " + error);
+        return res.status(500).json({message : error.message})
     }
 });
 
@@ -55,7 +74,7 @@ router.post('/login', [
 
     try {
         const {emailID, password} = req.body;
-        const user = await User.findOne({emailID : emailID});
+        const user = await prisma.user.findUnique({where : {emailID : emailID}})
 
         if(!user){
             return res.status(400).json({message : "Invalid credentials"})
@@ -68,9 +87,10 @@ router.post('/login', [
 
         const token = jwt.sign({userID : user.id}, process.env.JWT_SECRET_KEY as string, {expiresIn : "7d"});
         res.cookie("auth_token", token, {maxAge: 604800000, httpOnly : true, secure : process.env.NODE_ENV === 'production'})
-        return res.status(200).json({userID : user._id});
+        return res.status(200).json({userID : user.id});
     }
     catch(error : any){
+        console.log(error.message)
         return res.status(500).json({message : "Server error"})
     }
 })
@@ -82,7 +102,19 @@ router.get('/validate-token', verifyToken, (req : Request, res : Response) => {
 router.get('/user', verifyToken, async (req : Request, res : Response) => {
     const userID = req.userID;
     try{        
-        const user = await User.findById(userID).select("-password")
+        const user = await prisma.user.findUnique(
+        {
+            where : {id : userID}, 
+            select: {
+                id: true,
+                emailID: true,
+                createdAt: true,
+                profile: true,
+                routine: true,
+                password: false, // Exclude password
+            }
+        }
+        )
         if(!user){
             return res.status(400).json({message : "User not found"})
         }

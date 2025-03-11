@@ -8,6 +8,11 @@ import bodyParser from 'body-parser'
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser'
 
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
+
+
 dotenv.config();
 
 const app = express()
@@ -35,3 +40,10 @@ mongoose
 .catch((err : Error) => {
     console.log("Error connecting to DB", err)
 });
+
+// connect to postgresql server on neondb
+const connectionString = `${process.env.POSTGRES_URL}`
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
+
