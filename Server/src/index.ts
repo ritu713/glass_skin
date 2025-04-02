@@ -1,5 +1,4 @@
 import express from 'express'
-import mongoose from 'mongoose'
 import cors from 'cors'
 import authRoutes from './routes/Auth'
 import routineRoutes from './routes/Routine'
@@ -29,21 +28,24 @@ app.use('/api/auth', authRoutes)
 app.use('/api/routine', routineRoutes)
 app.use('/api/analyser', analyseRoutes)
 
-mongoose
-.connect(process.env.MONGO_URL as string)
-.then(() => {
-    console.log("App connected to DB successfully");
-    app.listen(process.env.PORT, () => {
-        console.log("Server up, listening to port " + process.env.PORT)
-    })
-})
-.catch((err : Error) => {
-    console.log("Error connecting to DB", err)
-});
-
 // connect to postgresql server on neondb
 const connectionString = `${process.env.POSTGRES_URL}`
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
+async function testConnection() {
+    try {
+      await prisma.$connect();
+      app.listen(process.env.PORT, () => {
+        console.log(`Server is running on port ${process.env.PORT}`);
+      }).on('error', (err) => {
+        console.error("Error starting server:", err);
+      });
+      console.log("Connected to the database successfully!");
+    } catch (error) {
+        console.error("Failed to connect to the database:", error);
+    }
+  }
+  
+testConnection();

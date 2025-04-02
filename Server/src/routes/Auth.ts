@@ -6,10 +6,11 @@ import bcrypt from 'bcrypt'
 import User from '../models/User/User'
 import verifyToken from '../middleware'
 import { PrismaClient } from '@prisma/client'
+import transporter from '../mailSystem' 
 //routes
 const router = express.Router();
 const prisma = new PrismaClient();
-
+ 
 //registeration route
 router.post('/register', [
     check("fName", "First name is required").isString(),
@@ -21,6 +22,7 @@ router.post('/register', [
         //returns empty if there are no validation errors found by "check" function
         const validationError = validationResult(req.body);
         if(!validationError.isEmpty()){
+            console.log(validationError.array())
             return res.status(400).json({message : validationError.array()})
         }
         const { emailID, password, profile } = req.body;
@@ -34,7 +36,7 @@ router.post('/register', [
         // Create user with profile
         const newUser = await prisma.user.create({
             data: {
-                emailID,
+                emailID : emailID,
                 password: hashedPassword,
                 createdAt: new Date(),
                 profile: {
@@ -54,19 +56,26 @@ router.post('/register', [
         const token = jwt.sign({userID : newUser.id}, process.env.JWT_SECRET_KEY as string, {expiresIn : "7d"})
         res.cookie("auth_token", token, {maxAge: 604800000, httpOnly : true, secure : process.env.NODE_ENV === 'production'});
 
+        // send confirmation email to user
+        const info = transporter.sendMail({
+            to : emailID,
+            subject : `Welcome to Glass Skin, ${profile.fName}`,
+            text : `Hi ${profile.fName},\n\nThank you for registering with us. We are excited to have you on board!\n\nBest regards,\nThe Glass Skin Team`,
+        })        
+
         return res.status(200).send({message : "User registered OK"})
     }
     catch(error : any){
-        console.log("Error occured : " + error);
-        return res.status(500).json({message : error.message})
+        console.log(error.message)
+        return res.status(500).json({message : "Something went wrong"})
     }
-});
+}) 
 
 router.post('/login', [
     check("emailID", "Please enter your registered email").isEmail(),
     check("password", "Please enter your password").isString()
 ], async (req : Request, res : Response) => {
-
+    console.log("here")
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         return res.status(400).json({message : errors.array()})
@@ -74,7 +83,9 @@ router.post('/login', [
 
     try {
         const {emailID, password} = req.body;
+        console.log("Finding user")
         const user = await prisma.user.findUnique({where : {emailID : emailID}})
+        console.log("User found")
 
         if(!user){
             return res.status(400).json({message : "Invalid credentials"})
@@ -87,6 +98,7 @@ router.post('/login', [
 
         const token = jwt.sign({userID : user.id}, process.env.JWT_SECRET_KEY as string, {expiresIn : "7d"});
         res.cookie("auth_token", token, {maxAge: 604800000, httpOnly : true, secure : process.env.NODE_ENV === 'production'})
+        console.log("User logged in successfully")
         return res.status(200).json({userID : user.id});
     }
     catch(error : any){

@@ -27,6 +27,7 @@ export const createNewUser = async (form_data : RegisterFormData) => {
 
     const responseBody = await response.json();
     if(!response.ok){
+        console.log(responseBody)
         throw new Error(responseBody);
     }
 }
